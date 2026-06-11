@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InspiGraphie | Suivi Alternance</title>
+
+    <style>
+        /* ===== FONTS ===== */
+        @font-face {
+            font-family: "DonGraffiti";
+            src: url("DonGraffiti.otf") format("opentype"),
+                 url("DonGraffiti.ttf") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        /* ===== GLOBAL & CHARTE INSPI ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #08080c;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            padding-bottom: 60px;
+        }
+
+        /* Calque fixe pour le fond d'écran */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url("fond.jpg");
+            background-size: cover;
+            background-position: center;
+            z-index: -10; 
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* ===== HEADER GLASS (Look Apple Premium) ===== */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 40px;
+            position: sticky; 
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(10, 10, 15, 0.4); 
+            backdrop-filter: blur(30px) saturate(250%);
+            -webkit-backdrop-filter: blur(30px) saturate(250%);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .header-left img { width: 100px; height: auto; object-fit: contain; }
+
+        .header-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .logo-typo { 
+            font-size: 3rem; 
+            font-family: "DonGraffiti", sans-serif; 
+            color: white; 
+            text-shadow: 0 4px 15px rgba(0,0,0,0.6); 
+        }
+
+        .nav { display: flex; gap: 25px; }
+        .nav a {
+            text-decoration: none;
+            color: white;
+            opacity: 0.75; 
+            font-size: 1.1rem;
+            transition: 0.3s;
+            position: relative;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        .nav a:hover, .nav a.active { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.6); }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            z-index: 2100;
+        }
+        .hamburger span {
+            display: block;
+            width: 28px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+
+        /* ===== INTRO TITLE ===== */
+        .workspace-title {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+        .workspace-title h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.9);
+        }
+        .workspace-title p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.15rem;
+            font-weight: 500;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+        }
+
+        /* ===== SUPREME APPLE GLASS CONTAINER ===== */
+        .card {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(40px) saturate(250%);
+            -webkit-backdrop-filter: blur(40px) saturate(250%);
+            padding: 40px 30px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 
+                        inset 0 -1px 20px rgba(0, 0, 0, 0.2),
+                        0 25px 60px rgba(0, 0, 0, 0.6);
+            margin-bottom: 40px;
+        }
+
+        .card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        /* ===== FORMULAIRE INTERNE ===== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        input, select, textarea {
+            padding: 14px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            font-size: 1rem;
+            background-color: rgba(0, 0, 0, 0.55);
+            color: #ffffff;
+            outline: none;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: rgba(255, 255, 255, 0.6);
+            background-color: rgba(0, 0, 0, 0.7);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(255, 255, 255, 0.15);
+        }
+
+        select option {
+            background-color: #121216;
+            color: white;
+        }
+
+        /* ===== BOUTONS ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 42px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: white;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .btn:hover {
+            transform: scale(1.02) translateY(-2px);
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== TABLEAU DANS UN DOSSIER EN VERRE ===== */
+        .table-container {
+            overflow-x: auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(40px) saturate(250%);
+            -webkit-backdrop-filter: blur(40px) saturate(250%);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 
+                        0 25px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: rgba(255, 255, 255, 0.85);
+            padding: 22px 18px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        td {
+            padding: 20px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            vertical-align: middle;
+            transition: background-color 0.2s ease;
+            color: #ffffff;
+            font-weight: 500;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.06);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .badge-contact {
+            background-color: rgba(255, 255, 255, 0.12);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        /* Statuts "Apple Neon-Glass" */
+        .status-en-attente { background: rgba(245, 158, 11, 0.2); color: #ffd066; border: 1px solid rgba(245, 158, 11, 0.4); }
+        .status-entretien { background: rgba(59, 130, 246, 0.2); color: #7cb3ff; border: 1px solid rgba(59, 130, 246, 0.4); }
+        .status-accepte { background: rgba(16, 185, 129, 0.2); color: #5cebb5; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .status-refuse { background: rgba(239, 68, 68, 0.2); color: #ff8e8e; border: 1px solid rgba(239, 68, 68, 0.4); }
+
+        .date-relance {
+            color: #ff9b6a;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+        }
+
+        .comment-text {
+            max-width: 220px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.85);
+            white-space: pre-line;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+        }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ff8e8e;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-delete:hover {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+            margin-top: 60px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        /* ===== ANIMATIONS REVEAL ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ======================================================= */
+        /* ===== 📱 RESPONSIVE AVANCÉ (MOBILE & TABLETTE) ===== */
+        /* ======================================================= */
+        @media (max-width: 950px) {
+            header { 
+                padding: 10px 20px; 
+                height: 70px; 
+            }
+            .header-left img { width: 50px !important; }
+            .header-center .logo-typo { font-size: 1.8rem; white-space: nowrap; }
+            
+            /* Menu burger */
+            .hamburger { display: flex; }
+            .nav {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 100%;
+                height: 100vh;
+                background: rgba(8, 8, 12, 0.98);
+                backdrop-filter: blur(30px);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 30px;
+                transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+                z-index: 2000;
+            }
+            .nav.open { right: 0; }
+            .nav a { font-size: 2rem; }
+            .hamburger.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+            .hamburger.active span:nth-child(2) { opacity: 0; }
+            .hamburger.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
+            
+            .workspace-title h2 { font-size: 2.2rem; }
+            .workspace-title p { font-size: 1rem; }
+            
+            /* Formulaire sur une colonne */
+            .card { padding: 30px 20px; border-radius: 20px; }
+            .form-grid { grid-template-columns: 1fr; gap: 15px; }
+            .btn { width: 100%; padding: 16px; }
+
+            /* 💥 TRANSFORMATION DU TABLEAU EN LISTE DE CARTES SUR MOBILE 💥 */
+            .table-container {
+                background: transparent;
+                box-shadow: none;
+                border: none;
+            }
+            table, thead, tbody, th, td, tr { 
+                display: block; 
+            }
+            thead { 
+                display: none; /* Cache les entêtes du tableau devenus inutiles */
+            }
+            tr {
+                /* Chaque ligne devient une carte en verre indépendante */
+                background: rgba(255, 255, 255, 0.05);
+                backdrop-filter: blur(40px) saturate(250%);
+                -webkit-backdrop-filter: blur(40px) saturate(250%);
+                border-radius: 20px;
+                border: 1px solid rgba(255, 255, 255, 0.16);
+                padding: 20px;
+                margin-bottom: 20px;
+                box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 10px 30px rgba(0, 0, 0, 0.4);
+            }
+            td {
+                padding: 10px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                text-align: right;
+                font-size: 0.95rem;
+            }
+            td:last-child {
+                border-bottom: none;
+                padding-top: 15px;
+                justify-content: center; /* Centre le bouton supprimer au bas de la carte */
+            }
+            
+            /* Génère automatiquement des labels à gauche pour chaque info */
+            td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                text-align: left;
+                color: rgba(255, 255, 255, 0.6);
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            td[style*="font-weight: 700"] {
+                font-size: 1.2rem;
+                border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+                padding-bottom: 12px;
+                margin-bottom: 5px;
+            }
+            .comment-text {
+                max-width: 60%;
+            }
+            .btn-delete {
+                width: 100%;
+                padding: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <img src="logo.png" alt="Logo" class="logo-visuel">
+    </div>
+
+    <div class="header-center">
+        <div class="logo-typo">InspiGraphie</div>
+    </div>
+
+    <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <nav class="nav" id="nav-menu">
+        <a href="index.html">Accueil</a>
+        <a href="projets.html">Projets</a>
+        <a href="competences.html">Compétences</a>
+        <a href="apropos.html">À propos</a>
+        <a href="services.html">Services</a>
+        <a href="contact.html">Contact</a>
+    </nav>
+</header>
+
+<div class="container">
+    <div class="workspace-title reveal">
+        <h2>Suivi</h2>
+        <p>Suivi de mes candidatures d'alternance</p>
+    </div>
+
+    <div class="card reveal">
+        <h3>✨ Nouvelle demande</h3>
+        <form id="applicationForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="company">Entreprise *</label>
+                    <input type="text" id="company" required placeholder="Ex: Agence Web X, Studio Graphic...">
+                </div>
+
+                <div class="form-group">
+                    <label for="type">Mode de contact *</label>
+                    <select id="type" required>
+                        <option value="📧 E-mail">📧 E-mail</option>
+                        <option value="📞 Téléphone">📞 Téléphone</option>
+                        <option value="🚶 Présentiel">🚶 Physique / Présentiel</option>
+                        <option value="🌐 LinkedIn">🌐 LinkedIn</option>
+                        <option value="💻 Site Web">💻 Site carrière</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="dateSent">Date d'envoi *</label>
+                    <input type="date" id="dateSent" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Statut actuel *</label>
+                    <select id="status" required>
+                        <option value="⏳ En attente">⏳ En attente</option>
+                        <option value="🗓️ Entretien">🗓️ Entretien décroché</option>
+                        <option value="🎉 Accepté">🎉 Accepté / Signé</option>
+                        <option value="❌ Refusé">❌ Refusé</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="reminderDate">Relance prévue le</label>
+                    <input type="date" id="reminderDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="contact">Contact direct</label>
+                    <input type="text" id="contact" placeholder="Ex: Julie (Chargée RH) - 06...">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="comments">Commentaires & Notes</label>
+                    <textarea id="comments" rows="3" placeholder="Détails de l'offre, relances effectuées, arguments clés..."></textarea>
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn">Ajouter au tableau</button>
+        </form>
+    </div>
+
+    <div class="table-container reveal">
+        <table id="applicationsTable">
+            <thead>
+                <tr>
+                    <th>Entreprise</th>
+                    <th>Mode</th>
+                    <th>Date d'envoi</th>
+                    <th>Statut</th>
+                    <th>Relance</th>
+                    <th>Contact</th>
+                    <th>Commentaires</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                </tbody>
+        </table>
+        <div id="emptyMessage" class="empty-state">Connexion à l'espace cloud...</div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>© 2026 InspiGraphie — Suivi de Candidatures</p>
+</footer>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Configuration Firebase officielle
+    const firebaseConfig = {
+        apiKey: "AIzaSyA42F45hE0SZ5m57g5nm9aKcHS9IAnEc20",
+        authDomain: "alternance-5356b.firebaseapp.com",
+        projectId: "alternance-5356b",
+        storageBucket: "alternance-5356b.firebasestorage.app",
+        messagingSenderId: "918736827803",
+        appId: "1:918736827803:web:28439bb401bbb79414dd3e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const alternancesRef = collection(db, "alternances");
+
+    const form = document.getElementById('applicationForm');
+    const tableBody = document.getElementById('tableBody');
+    const emptyMessage = document.getElementById('emptyMessage');
+
+    document.getElementById('dateSent').valueAsDate = new Date();
+
+    const q = query(alternancesRef, orderBy("dateSent", "desc"));
+    
+    onSnapshot(q, (snapshot) => {
+        tableBody.innerHTML = '';
+        
+        if (snapshot.empty) {
+            emptyMessage.style.display = 'block';
+            emptyMessage.textContent = "Aucune candidature enregistrée pour le moment.";
+            return;
+        } else {
+            emptyMessage.style.display = 'none';
+        }
+
+        snapshot.forEach((docSnap) => {
+            const app = docSnap.data();
+            const id = docSnap.id;
+            
+            const tr = document.createElement('tr');
+
+            let statusClass = 'status-en-attente';
+            if(app.status.includes('Entretien')) statusClass = 'status-entretien';
+            if(app.status.includes('Accepté')) statusClass = 'status-accepte';
+            if(app.status.includes('Refusé')) statusClass = 'status-refuse';
+
+            const formatDate = (dateStr) => {
+                if (!dateStr) return '-';
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('fr-FR');
+            };
+
+            // Attribution des attributs data-label indispensables pour la transformation responsive mobile
+            tr.innerHTML = `
+                <td data-label="Entreprise" style="font-weight: 700; color: #ffffff; text-shadow: 0 3px 8px rgba(0,0,0,0.8);">${escapeHTML(app.company)}</td>
+                <td data-label="Mode"><span class="badge badge-contact">${app.type}</span></td>
+                <td data-label="Date d'envoi">${formatDate(app.dateSent)}</td>
+                <td data-label="Statut"><span class="badge ${statusClass}">${app.status}</span></td>
+                <td data-label="Relance">${app.reminderDate ? `<span class="date-relance">⏰ ${formatDate(app.reminderDate)}</span>` : '-'}</td>
+                <td data-label="Contact">${escapeHTML(app.contact) || '-'}</td>
+                <td data-label="Commentaires"><div class="comment-text" title="${escapeHTML(app.comments)}">${escapeHTML(app.comments) || '-'}</div></td>
+                <td><button class="btn-delete" data-id="${id}">Supprimer</button></td>
+            `;
+            tableBody.appendChild(tr);
+        });
+
+        document.querySelectorAll('.btn-delete').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const docId = e.target.getAttribute('data-id');
+                if(confirm("Supprimer définitivement cette candidature ?")) {
+                    try {
+                        await deleteDoc(doc(db, "alternances", docId));
+                    } catch (error) {
+                        alert("Erreur : " + error.message);
+                    }
+                }
+            });
+        });
+    }, (error) => {
+        emptyMessage.textContent = "Erreur Firebase : Règles Firestore non configurées.";
+        console.error(error);
+    });
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Envoi...";
+
+        try {
+            await addDoc(alternancesRef, {
+                company: document.getElementById('company').value,
+                type: document.getElementById('type').value,
+                dateSent: document.getElementById('dateSent').value,
+                status: document.getElementById('status').value,
+                reminderDate: document.getElementById('reminderDate').value,
+                contact: document.getElementById('contact').value,
+                comments: document.getElementById('comments').value
+            });
+
+            form.reset();
+            document.getElementById('dateSent').valueAsDate = new Date();
+        } catch (error) {
+            alert("Erreur : " + error.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Ajouter au tableau";
+        }
+    });
+
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/[&<>'"]/g, 
+            tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+        );
+    }
+</script>
+
+<script>
+    // --- GESTION DU MENU HAMBURGER ---
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('nav-menu');
+
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('open');
+        document.body.style.overflow = navMenu.classList.contains('open') ? 'hidden' : 'auto';
+    });
+
+    // --- GESTION DE L'ANIMATION AU SCROLL ---
+    const revealElements = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    revealElements.forEach(el => revealObserver.observe(el));
+</script>
+
+</body>
+</html>
