@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr font">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -115,7 +115,7 @@
         .workspace-title {
             text-align: center;
             margin-top: 20px;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
         .workspace-title h2 {
             font-size: 3rem;
@@ -130,6 +130,40 @@
             font-size: 1.15rem;
             font-weight: 500;
             text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+        }
+
+        /* ===== COMPTEUR DE DEMANDES (Apple Style) ===== */
+        .counter-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            max-width: 320px;
+            margin: 0 auto 30px auto;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(40px) saturate(250%);
+            -webkit-backdrop-filter: blur(40px) saturate(250%);
+            padding: 12px 25px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        .counter-label {
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.85);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .counter-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 2px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         /* ===== SUPREME APPLE GLASS CONTAINER ===== */
@@ -310,9 +344,9 @@
             border-radius: 10px;
             font-size: 0.8rem;
             font-weight: 700;
-            color: inherit; /* Récupère la couleur du statut */
+            color: inherit; 
             background-color: transparent;
-            border: 1px solid currentColor; /* Bordure de la même couleur que le texte */
+            border: 1px solid currentColor; 
             cursor: pointer;
             outline: none;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
@@ -323,7 +357,7 @@
             background-color: rgba(255, 255, 255, 0.05);
         }
 
-        /* Classes de couleurs appliquées dynamiquement via le script */
+        /* Classes de couleurs appliquées dynamiquement */
         .status-en-attente { background-color: rgba(245, 158, 11, 0.15); color: #ffd066 !important; }
         .status-entretien { background-color: rgba(59, 130, 246, 0.15); color: #7cb3ff !important; }
         .status-accepte { background-color: rgba(16, 185, 129, 0.15); color: #5cebb5 !important; }
@@ -507,6 +541,11 @@
         <p>Gère et mets à jour tes candidatures d'alternance en temps réel</p>
     </div>
 
+    <div class="counter-box reveal">
+        <span class="counter-label">✉️ Demandes envoyées</span>
+        <span class="counter-value" id="globalCounter">0</span>
+    </div>
+
     <div class="card reveal">
         <h3>✨ Nouvelle demande</h3>
         <form id="applicationForm">
@@ -608,6 +647,7 @@
     const form = document.getElementById('applicationForm');
     const tableBody = document.getElementById('tableBody');
     const emptyMessage = document.getElementById('emptyMessage');
+    const globalCounter = document.getElementById('globalCounter');
 
     document.getElementById('dateSent').valueAsDate = new Date();
 
@@ -615,6 +655,9 @@
     
     onSnapshot(q, (snapshot) => {
         tableBody.innerHTML = '';
+        
+        // Mise à jour en temps réel du compteur avec le nombre de documents
+        globalCounter.textContent = snapshot.size;
         
         if (snapshot.empty) {
             emptyMessage.style.display = 'block';
@@ -630,7 +673,6 @@
             
             const tr = document.createElement('tr');
 
-            // Déterminer la classe couleur initiale du sélecteur
             let statusColorClass = 'status-en-attente';
             if(app.status === 'Entretien') statusColorClass = 'status-entretien';
             if(app.status === 'Accepté') statusColorClass = 'status-accepte';
@@ -662,20 +704,18 @@
             tableBody.appendChild(tr);
         });
 
-        // 🔄 LOGIQUE : CHANGEMENT DU STATUT DIRECTEMENT DANS LE TABLEAU
+        // Changement de statut à la volée
         document.querySelectorAll('.status-select').forEach(selectElement => {
             selectElement.addEventListener('change', async (e) => {
                 const docId = e.target.getAttribute('data-id');
                 const newStatus = e.target.value;
 
-                // Mise à jour visuelle immédiate des classes CSS de couleur
-                e.target.className = 'status-select'; // Reset
+                e.target.className = 'status-select'; 
                 if(newStatus === 'En attente') e.target.classList.add('status-en-attente');
                 if(newStatus === 'Entretien') e.target.classList.add('status-entretien');
                 if(newStatus === 'Accepté') e.target.classList.add('status-accepte');
                 if(newStatus === 'Refusé') e.target.classList.add('status-refuse');
 
-                // Écriture de la modif en tâche de fond sur Firebase !
                 try {
                     const docRef = doc(db, "alternances", docId);
                     await updateDoc(docRef, { status: newStatus });
@@ -685,7 +725,7 @@
             });
         });
 
-        // Logique de suppression
+        // Suppression
         document.querySelectorAll('.btn-delete').forEach(button => {
             button.addEventListener('click', async (e) => {
                 const docId = e.target.getAttribute('data-id');
@@ -703,7 +743,7 @@
         console.error(error);
     });
 
-    // Logique d'ajout d'une demande
+    // Ajout d'une demande
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         const submitBtn = document.getElementById('submitBtn');
